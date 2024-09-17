@@ -1,0 +1,88 @@
+---
+title: "R_T3_master"
+output: pdf_document
+date: "2024-09-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load required packages
+
+```{r}
+# Install necessary packages
+if(!require(tidyverse)) install.packages('tidyverse')
+if(!require(ggplot2)) install.packages('ggplot2')
+if(!require(lmtest)) install.packages('lmtest')
+if(!require(broom)) install.packages('broom')
+if(!require(readr)) install.packages('readr')
+if(!require(dplyr)) install.packages('dplyr')
+
+
+```
+# Load the dataset
+```{r}
+
+df <- read_csv('data.csv')
+head(df)
+
+```
+# Data Cleaning: Drop unnecessary columns
+```{r}
+
+df <- df %>% select(-c('Talk_ID', 'total', 'Beautiful', 'Ingenious'))
+head(df)
+
+```
+```{r}
+colnames(df)
+```
+
+# Feature Engineering: Creating new features
+```{r}
+
+df <- df %>%
+  mutate(ted_33 = TED^3,
+         ted_global_33 = TEDGlobal^3,
+         ted_x_33 = TEDx^3)
+```
+# Linear Regression Model
+```{r}
+
+formula <- as.formula('log_views ~ .')
+model <- lm(formula, data = df)
+summary(model)
+
+```
+
+# Visualize: Scatter plot and regression line
+```{r}
+# Visualize: Scatter plot and regression line
+ggplot(df, aes(x = duration, y = log_views)) +
+  geom_point(color = 'green') +
+  geom_smooth(method = 'lm', se = FALSE) +
+  labs(x = 'duration', y = 'log_views')
+```
+# Model Evaluation: MSE and R-squared
+```{r}
+
+predictions <- predict(model, df)
+mse <- mean((df$log_views - predictions)^2)
+r2 <- summary(model)$r.squared
+
+mse
+r2
+```
+
+
+
+
+
+
+
+
+```{r}
+
+```
+
